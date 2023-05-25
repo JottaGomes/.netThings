@@ -18,14 +18,18 @@ namespace Controllers
 
         [HttpGet("GetAll")]  
         public ActionResult<List<Character>> Get(){
-
             return Ok(characters); 
         }
 
         [HttpGet("{id}")]
         public ActionResult<Character> GetSingle(int id){
-
             return Ok(characters.FirstOrDefault(c => c.id == id)); 
+        }
+
+        [HttpPost("addCharacters")]
+        public ActionResult<List<Character>> AddCharacter(Character newCharacter){
+            characters.Add(newCharacter); 
+            return Ok(characters); 
         }
     }
 }
