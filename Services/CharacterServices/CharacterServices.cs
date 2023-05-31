@@ -79,7 +79,7 @@ namespace Services.CharacterServices
            var serviceResponse = new ServiceResponse<List<GetCharacterDTO>>(); 
          
            try{
-            var character = characters.First(c => c.id == id); 
+            var character = characters.FirstOrDefault(c => c.id == id); 
             if (character is null)
                     throw new Exception($"Character with id '{id}' not found."); 
             
