@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 
@@ -8,7 +9,6 @@ namespace Services.CharacterServices
 {
     public class CharacterServices : ICharacterServices
     {
-        
         private readonly IMapper _mapper; 
         private readonly DataContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -20,6 +20,8 @@ namespace Services.CharacterServices
             _mapper = mapper; 
         }
 
+
+        private int GetUserId () => int.Parse(_httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier)!); 
         public async Task<ServiceResponse<List<GetCharacterDTO>>> addNewCharacter(CreateCharacterDTO addCharacter){
 
             var serviceResponse = new ServiceResponse<List<GetCharacterDTO>>(); 
@@ -33,10 +35,10 @@ namespace Services.CharacterServices
             return serviceResponse; 
         }
 
-        public async Task<ServiceResponse<List<GetCharacterDTO>>> GetAllCharacters(int userId){
+        public async Task<ServiceResponse<List<GetCharacterDTO>>> GetAllCharacters(){
             
             var serviceResponse = new ServiceResponse<List<GetCharacterDTO>>(); 
-            var dbCharacters = await _context.Characters.Where(c => c.User!.Id == userId).ToListAsync();
+            var dbCharacters = await _context.Characters.Where(c => c.User!.Id == GetUserId()).ToListAsync();
             serviceResponse.Data = dbCharacters.Select(c => _mapper.Map<GetCharacterDTO>(c)).ToList(); 
             return serviceResponse; 
         }
