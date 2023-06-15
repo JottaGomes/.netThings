@@ -11,10 +11,12 @@ namespace Services.CharacterServices
         
         private readonly IMapper _mapper; 
         private readonly DataContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public CharacterServices(IMapper mapper, DataContext context){
+        public CharacterServices(IMapper mapper, DataContext context, IHttpContextAccessor httpContextAccessor){
 
-            _context = context; 
+            _context = context;
+            _httpContextAccessor = httpContextAccessor;
             _mapper = mapper; 
         }
 
@@ -31,10 +33,10 @@ namespace Services.CharacterServices
             return serviceResponse; 
         }
 
-        public async Task<ServiceResponse<List<GetCharacterDTO>>> GetAllCharacters(){
+        public async Task<ServiceResponse<List<GetCharacterDTO>>> GetAllCharacters(int userId){
             
             var serviceResponse = new ServiceResponse<List<GetCharacterDTO>>(); 
-            var dbCharacters = await _context.Characters.ToListAsync();
+            var dbCharacters = await _context.Characters.Where(c => c.User!.Id == userId).ToListAsync();
             serviceResponse.Data = dbCharacters.Select(c => _mapper.Map<GetCharacterDTO>(c)).ToList(); 
             return serviceResponse; 
         }
