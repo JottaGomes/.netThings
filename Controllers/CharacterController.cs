@@ -2,12 +2,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 
 namespace Controllers
-{
+{   
+
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class CharacterController : ControllerBase {
@@ -21,7 +25,9 @@ namespace Controllers
 
         [HttpGet("GetAll")]  
         public async Task<ActionResult<ServiceResponse<List<GetCharacterDTO>>>> Get(){
-            return Ok(await _characterService.GetAllCharacters()); 
+            
+            int userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value); // that way we only get the character that belong the the specific user
+            return Ok(await _characterService.GetAllCharacters(userId)); 
         }
 
         [HttpGet("{id}")]
