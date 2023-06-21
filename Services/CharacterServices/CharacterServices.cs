@@ -27,11 +27,16 @@ namespace Services.CharacterServices
             var serviceResponse = new ServiceResponse<List<GetCharacterDTO>>(); 
             var character = _mapper.Map<Character>(addCharacter); 
 
+            character.User = await _context.Users.FirstOrDefaultAsync(c => c.Id == GetUserId()); 
+ 
             _context.Characters.Add(character); 
             await _context.SaveChangesAsync(); 
 
             serviceResponse.Data = 
-                await _context.Characters.Select(c => _mapper.Map<GetCharacterDTO>(c)).ToListAsync(); 
+                await _context.Characters
+                    .Where(c => c.User!.Id == GetUserId())
+                    .Select(c => _mapper.Map<GetCharacterDTO>(c))
+                    .ToListAsync(); 
             return serviceResponse; 
         }
 
@@ -46,11 +51,9 @@ namespace Services.CharacterServices
         public async Task<ServiceResponse<GetCharacterDTO>> GetCharacterById(int id){
             
             var serviceResponse = new ServiceResponse<GetCharacterDTO>(); 
-            var dbCharacters = await _context.Characters.FirstOrDefaultAsync(c => c.id == id);        
+            var dbCharacters = await _context.Characters.FirstOrDefaultAsync(c => c.id == id && c.User!.Id == GetUserId());        
             serviceResponse.Data = _mapper.Map<GetCharacterDTO>(dbCharacters);   
             return serviceResponse; 
-
-            
         }
 
         public async Task<ServiceResponse<GetCharacterDTO>> UpdateCharacter(UpdateCharacterDTO updateCharacterDTO){
@@ -84,7 +87,7 @@ namespace Services.CharacterServices
            var serviceResponse = new ServiceResponse<List<GetCharacterDTO>>(); 
          
            try{
-            var character = await _context.Characters.FirstOrDefaultAsync(c => c.id == id); 
+            var character = await _context.Characters.FirstOrDefaultAsync(c => c.id == id && c.User!.Id == GetUserId()); 
             if (character is null)
                     throw new Exception($"Character with id '{id}' not found."); 
             
@@ -92,7 +95,9 @@ namespace Services.CharacterServices
 
             await _context.SaveChangesAsync(); 
 
-            serviceResponse.Data = await _context.Characters.Select(c => _mapper.Map<GetCharacterDTO>(c)).ToListAsync(); 
+            serviceResponse.Data = await _context.Characters
+                .Where(c => c.User!.Id == GetUserId())    
+                .Select(c => _mapper.Map<GetCharacterDTO>(c)).ToListAsync(); 
 
            } catch (Exception ex){
                 serviceResponse.Succcess = false; 
