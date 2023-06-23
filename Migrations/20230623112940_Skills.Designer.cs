@@ -4,6 +4,7 @@ using Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace _netThings.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230623112940_Skills")]
+    partial class Skills
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -95,29 +98,6 @@ namespace _netThings.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Skills");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CharacterId = 0,
-                            Damage = 10,
-                            Name = "FireBall"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CharacterId = 0,
-                            Damage = 5,
-                            Name = "FrostBall"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            CharacterId = 0,
-                            Damage = 99,
-                            Name = "Khamehame"
-                        });
                 });
 
             modelBuilder.Entity("Models.User", b =>
