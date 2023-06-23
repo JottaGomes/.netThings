@@ -61,14 +61,16 @@ namespace Services.CharacterServices
            var serviceResponse = new ServiceResponse<GetCharacterDTO>(); 
          
            try{
-            var character = await _context.Characters.FirstOrDefaultAsync(c => c.id == updateCharacterDTO.id); 
-            if (character is null)
+            var character = await _context.Characters
+                .Include(c => c.User)
+                .FirstOrDefaultAsync(c => c.id == updateCharacterDTO.id); 
+            if (character is null || character.User!.Id != GetUserId())
                     throw new Exception($"Character with id '{updateCharacterDTO.id}' not found."); 
 
             character.Name = updateCharacterDTO.Name; 
             character.hitPoints = updateCharacterDTO.hitPoints; 
             character.defence = updateCharacterDTO.defence; 
-            character.strength = updateCharacterDTO.strength; 
+            character.strength = updateCharacterDTO.strength;  
             character.intelligence = updateCharacterDTO.intelligence; 
             character.Class = updateCharacterDTO.Class;
 
