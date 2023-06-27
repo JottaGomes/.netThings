@@ -13,5 +13,6 @@ namespace Services.CharacterServices
     Task<ServiceResponse<List<GetCharacterDTO>>> addNewCharacter(CreateCharacterDTO addCharacter); 
     Task<ServiceResponse<GetCharacterDTO>> UpdateCharacter(UpdateCharacterDTO updateCharacterDTO); 
     Task<ServiceResponse<List<GetCharacterDTO>>> DeleteCharacter(int id); 
+    Task<ServiceResponse<GetCharacterDTO>> AddCharacterSkill(AddCharacterSkillDto newCharacterSkill); 
     }
 }
