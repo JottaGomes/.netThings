@@ -43,7 +43,10 @@ namespace Services.CharacterServices
         public async Task<ServiceResponse<List<GetCharacterDTO>>> GetAllCharacters(){
             
             var serviceResponse = new ServiceResponse<List<GetCharacterDTO>>(); 
-            var dbCharacters = await _context.Characters.Where(c => c.User!.Id == GetUserId()).ToListAsync();
+            var dbCharacters = await _context.Characters
+                .Include(c => c.Weapon)
+                .Include(C => C.Skills)
+                .Where(c => c.User!.Id == GetUserId()).ToListAsync();
             serviceResponse.Data = dbCharacters.Select(c => _mapper.Map<GetCharacterDTO>(c)).ToList(); 
             return serviceResponse; 
         }
@@ -51,7 +54,10 @@ namespace Services.CharacterServices
         public async Task<ServiceResponse<GetCharacterDTO>> GetCharacterById(int id){
             
             var serviceResponse = new ServiceResponse<GetCharacterDTO>(); 
-            var dbCharacters = await _context.Characters.FirstOrDefaultAsync(c => c.id == id && c.User!.Id == GetUserId());        
+            var dbCharacters = await _context.Characters
+                .Include(c => c.Weapon)
+                .Include(C => C.Skills)
+                .FirstOrDefaultAsync(c => c.id == id && c.User!.Id == GetUserId());        
             serviceResponse.Data = _mapper.Map<GetCharacterDTO>(dbCharacters);   
             return serviceResponse; 
         }
@@ -108,5 +114,42 @@ namespace Services.CharacterServices
             return serviceResponse; 
              
         }
+
+        public async Task<ServiceResponse<GetCharacterDTO>> AddCharacterSkill(AddCharacterSkillDto newCharacterSkill)
+        {
+            var response = new ServiceResponse<GetCharacterDTO>(); 
+
+            try {
+
+                var character = await _context.Characters
+                    .Include(c => c.Weapon)
+                    .Include(c => c.Skills)
+                    .FirstOrDefaultAsync(c => c.id == newCharacterSkill.CharacterId &&
+                     c.User!.Id == GetUserId());  
+
+                if (character is null){
+                    response.Succcess = false; 
+                    response.Message = "Character not found"; 
+                    return response; 
+                }
+
+                var skill = await _context.Skills.FirstOrDefaultAsync(s => s.Id == newCharacterSkill.SkillId); 
+
+                if (skill is null){
+                    response.Succcess = false; 
+                    response.Message = "Skill not found"; 
+                    return response; 
+                }
+
+                character.Skills!.Add(skill); 
+                await _context.SaveChangesAsync(); 
+                response.Data = _mapper.Map<GetCharacterDTO>(character); 
+
+            } catch (Exception ex) {
+                response.Succcess = false; 
+                response.Message = ex.Message; 
+            }
+            return response; 
+        }
     }
-}
+}   
