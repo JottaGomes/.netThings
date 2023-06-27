@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Dtos.Fighter;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Controllers
@@ -17,7 +18,10 @@ namespace Controllers
             _fightService = fightService;    
         }
 
+        [HttpPost("weapon")]
+        public async Task<ActionResult<ServiceResponse<AttackResultDto>>> WeaponAttack (WeaponAttackDto request){
 
-
+            return Ok(await _fightService.WeaponAttack(request)); 
+        }
     }
 }
